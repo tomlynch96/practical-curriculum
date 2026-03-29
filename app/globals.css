@@ -1,27 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --ink: #1a1a2e;
+  --ink-light: #2d2d4e;
+  --acid: #c8f135;
+  --acid-dark: #a8cc1a;
+  --chalk: #ffffff;
+  --chalk-off: #f8f9fa;
+  --slate-lab: #f0f2f5;
+  --coral: #ff6b6b;
+  --sky: #4ecdc4;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: "DM Sans", sans-serif;
+  background-color: var(--slate-lab);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "DM Serif Display", serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--chalk-off);
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--acid-dark);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-ink text-acid font-body font-medium px-6 py-3 text-sm tracking-wide transition-all duration-150 hover:bg-ink-light active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-ink text-ink font-body font-medium px-6 py-3 text-sm tracking-wide transition-all duration-150 hover:bg-ink hover:text-chalk active:scale-95;
+  }
+
+  .btn-acid {
+    @apply bg-acid text-ink font-body font-semibold px-6 py-3 text-sm tracking-wide transition-all duration-150 hover:bg-acid-dark active:scale-95;
+  }
+
+  .card {
+    @apply bg-chalk border border-gray-200 p-6;
+  }
+
+  .input {
+    @apply w-full border border-gray-300 bg-chalk px-4 py-3 text-sm font-body text-ink placeholder-gray-400 focus:border-ink focus:outline-none transition-colors duration-150;
+  }
+
+  .label {
+    @apply block text-xs font-medium tracking-widest uppercase text-gray-500 mb-2;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-2 py-1 text-xs font-mono font-medium bg-slate-lab border border-gray-200;
+  }
+
+  .tag-acid {
+    @apply inline-flex items-center px-2 py-1 text-xs font-mono font-medium bg-acid text-ink;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }
