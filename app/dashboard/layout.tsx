@@ -1,24 +1,54 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import Sidebar from "@/components/Sidebar";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const supabase = createClient();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*, departments(*)")
-    .eq("id", user.id)
-    .single();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
 
-  if (!profile) redirect("/login");
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*, departments(*)")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile) {
+        router.push("/login");
+        return;
+      }
+
+      setProfile(profile);
+      setLoading(false);
+    }
+
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-lab flex items-center justify-center">
+        <div className="text-gray-400 font-mono text-sm">Loading…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-lab">

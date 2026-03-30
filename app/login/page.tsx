@@ -1,93 +1,131 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Beaker, LayoutGrid, BookOpen } from "lucide-react";
+import { Beaker, Eye, EyeOff } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
-export default function HomePage() {
+export default function LoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  }
+
   return (
-    <main className="min-h-screen bg-ink text-chalk flex flex-col">
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-ink-light">
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-slate-lab flex">
+      <div className="hidden lg:flex lg:w-1/2 bg-ink flex-col justify-between p-12">
+        <Link href="/" className="flex items-center gap-3">
           <div className="w-8 h-8 bg-acid flex items-center justify-center">
             <Beaker size={16} className="text-ink" />
           </div>
           <span className="font-display text-xl text-chalk">SciSheet</span>
+        </Link>
+        <div>
+          <blockquote className="font-display text-3xl text-chalk leading-snug mb-4">
+            "Every practical. Every year group. Consistent."
+          </blockquote>
+          <p className="text-gray-500 text-sm">Skills-based worksheets for science departments.</p>
         </div>
-        <div className="flex items-center gap-4">
-          <Link
-            href="/login"
-            className="text-sm text-gray-400 hover:text-chalk transition-colors"
-          >
-            Log in
-          </Link>
-          <Link href="/signup" className="btn-acid text-sm px-4 py-2">
-            Get started
-          </Link>
-        </div>
-      </nav>
-
-      <section className="flex-1 flex flex-col items-center justify-center px-8 py-24 text-center max-w-4xl mx-auto">
-        <div className="tag-acid mb-8 text-xs tracking-widest uppercase">
-          Built for science departments
-        </div>
-        <h1 className="font-display text-6xl md:text-7xl leading-tight mb-6 text-balance">
-          Consistent worksheets.
-          <br />
-          <span className="text-acid">Every practical.</span>
-        </h1>
-        <p className="text-gray-400 text-lg max-w-xl mb-12 leading-relaxed">
-          Set your department's skill matrix once. Teachers generate
-          skills-based worksheets in seconds — formulaic, recognisable, and
-          perfectly levelled.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <Link href="/generate" className="btn-acid flex items-center gap-2">
-            Try free — no login needed
-            <ArrowRight size={16} />
-          </Link>
-          <Link
-            href="/signup"
-            className="btn-secondary border-gray-600 text-gray-300 hover:bg-ink-light hover:text-chalk"
-          >
-            Set up your department
-          </Link>
-        </div>
-      </section>
-
-      <section className="border-t border-ink-light px-8 py-16">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-px bg-ink-light">
-          {[
-            {
-              icon: <LayoutGrid size={20} />,
-              title: "Skill Matrix",
-              body: "HoDs define which skills are introduced, practised, and mastered at each year group. One setup, department-wide consistency.",
-            },
-            {
-              icon: <Beaker size={20} />,
-              title: "Smart Generation",
-              body: "Describe the practical. AI generates plausible data at the right precision, then builds a structured worksheet from your matrix.",
-            },
-            {
-              icon: <BookOpen size={20} />,
-              title: "Shared Library",
-              body: "Every worksheet saves to a shared departmental library. Duplicate, adapt, and build on each other's work.",
-            },
-          ].map((f) => (
-            <div key={f.title} className="bg-ink p-8">
-              <div className="w-10 h-10 bg-ink-light flex items-center justify-center text-acid mb-4">
-                {f.icon}
-              </div>
-              <h3 className="font-display text-xl mb-3">{f.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{f.body}</p>
-            </div>
+        <div className="flex gap-2 flex-wrap">
+          {["Graphing", "Statistics", "Evaluation", "Experimental Design"].map((d) => (
+            <span key={d} className="tag text-gray-500 text-xs">{d}</span>
           ))}
         </div>
-      </section>
+      </div>
 
-      <footer className="px-8 py-6 border-t border-ink-light flex items-center justify-between">
-        <span className="text-xs text-gray-600 font-mono">© 2025 SciSheet</span>
-        <span className="text-xs text-gray-600">Built for science departments</span>
-      </footer>
-    </main>
+      <div className="flex-1 flex items-center justify-center px-8 py-12">
+        <div className="w-full max-w-md">
+          <Link href="/" className="flex items-center gap-3 mb-10 lg:hidden">
+            <div className="w-8 h-8 bg-acid flex items-center justify-center">
+              <Beaker size={16} className="text-ink" />
+            </div>
+            <span className="font-display text-xl text-ink">SciSheet</span>
+          </Link>
+
+          <h1 className="font-display text-4xl text-ink mb-2">Welcome back</h1>
+          <p className="text-gray-500 text-sm mb-8">
+            Don't have an account?{" "}
+            <Link href="/signup" className="text-ink underline underline-offset-2">Sign up</Link>
+          </p>
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="label">Email address</label>
+              <input
+                type="email"
+                className="input"
+                placeholder="you@school.ac.uk"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="input pr-12"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-ink"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <div className="flex justify-end mt-2">
+                <Link href="/reset-password" className="text-xs text-gray-400 hover:text-ink underline underline-offset-2">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+            )}
+
+            <button type="submit" disabled={loading} className="btn-primary w-full text-center disabled:opacity-50">
+              {loading ? "Signing in…" : "Sign in"}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <p className="text-xs text-gray-400 text-center">
+              Just want to try it?{" "}
+              <Link href="/generate" className="underline underline-offset-2">Generate a free worksheet</Link>{" "}
+              — no account needed.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
