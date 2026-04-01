@@ -5,24 +5,16 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Sidebar from "@/components/Sidebar";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const supabase = createClient();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const supabase = createClient();
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+      if (!user) { router.push("/login"); return; }
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -30,15 +22,11 @@ export default function DashboardLayout({
         .eq("id", user.id)
         .single();
 
-      if (!profile) {
-        router.push("/login");
-        return;
-      }
+      if (!profile) { router.push("/login"); return; }
 
       setProfile(profile);
       setLoading(false);
     }
-
     load();
   }, []);
 

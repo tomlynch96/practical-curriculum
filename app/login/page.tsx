@@ -8,8 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +19,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -67,63 +66,35 @@ export default function LoginPage() {
           <h1 className="font-display text-4xl text-ink mb-2">Welcome back</h1>
           <p className="text-gray-500 text-sm mb-8">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-ink underline underline-offset-2">Sign up</Link>
+            <Link href="/signup" className="text-ink underline">Sign up</Link>
           </p>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="label">Email address</label>
-              <input
-                type="email"
-                className="input"
-                placeholder="you@school.ac.uk"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <label className="label">Email</label>
+              <input className="input" type="email" value={email}
+                onChange={e => setEmail(e.target.value)} required />
             </div>
             <div>
               <label className="label">Password</label>
               <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="input pr-12"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-ink"
-                >
+                <input className="input pr-10" type={showPassword ? "text" : "password"}
+                  value={password} onChange={e => setPassword(e.target.value)} required />
+                <button type="button" onClick={() => setShowPassword(p => !p)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <div className="flex justify-end mt-2">
-                <Link href="/reset-password" className="text-xs text-gray-400 hover:text-ink underline underline-offset-2">
-                  Forgot password?
-                </Link>
-              </div>
             </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
-            )}
-
-            <button type="submit" disabled={loading} className="btn-primary w-full text-center disabled:opacity-50">
+            {error && <p className="text-coral text-sm">{error}</p>}
+            <button type="submit" className="btn-primary w-full" disabled={loading}>
               {loading ? "Signing in…" : "Sign in"}
             </button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <p className="text-xs text-gray-400 text-center">
-              Just want to try it?{" "}
-              <Link href="/generate" className="underline underline-offset-2">Generate a free worksheet</Link>{" "}
-              — no account needed.
-            </p>
-          </div>
+          <p className="text-center text-sm text-gray-400 mt-6">
+            <Link href="/reset-password" className="underline">Forgot password?</Link>
+          </p>
         </div>
       </div>
     </div>
